@@ -1,8 +1,8 @@
-# 3D Particle Morphing
+# 3D Heart Particles Morphing Effect
 
-An interactive WebGL visualization where particles morph between different 3D shapes. This project demonstrates the use of Three.js for 3D rendering and GSAP for smooth animations.
+Specially for byx.
 
-[**Live Demo**](https://kshitij978.github.io/Three.js-Point-cloud-morphing-effect/)
+This project demonstrates a 3D heart particle morphing effect using Three.js. Particles transition smoothly between different 3D models (Queen, Pawn, and Explosion) while being distributed on the surface of the meshes. The interactive UI allows users to customize the animation in real-time.
 
 ## Features
 

@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { gsap } from "gsap";
 import { vertexShader, fragmentShader } from "./shaders";
-import { ModelLoader } from "./utils/ModelLoader";
 import {
   UIManager,
   ParticleSettings,
@@ -16,14 +15,13 @@ class ParticleMorpher {
   private settings: ParticleSettings;
   private particles: THREE.Points | null = null;
   private readonly models: { [key: string]: Float32Array } = {};
-  private currentShape: string = "queen";
+  private currentShape: string = "heart";
   private isTransitioning: boolean = false;
   private lastTime: number = 0;
   private lastMorphTime: number = 0;
   private mouse: THREE.Vector2 = new THREE.Vector2(-100, -100);
   private raycaster: THREE.Raycaster = new THREE.Raycaster();
   private mouseWorld: THREE.Vector3 = new THREE.Vector3();
-  private modelLoader: ModelLoader;
   private uiManager: UIManager;
 
   constructor() {
@@ -34,7 +32,7 @@ class ParticleMorpher {
     this.settings = { ...DEFAULT_SETTINGS }; // Clone defaults
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x030012);
+    this.scene.background = new THREE.Color(0xffffff);
 
     this.camera = new THREE.PerspectiveCamera(
       45,
@@ -52,7 +50,6 @@ class ParticleMorpher {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-    this.modelLoader = new ModelLoader();
     this.uiManager = new UIManager(
       this.settings,
       (shape) => this.morphTo(shape),
@@ -70,7 +67,7 @@ class ParticleMorpher {
     await this.loadModels();
     this.hideLoader();
 
-    this.morphTo("queen");
+    this.morphTo("heart");
     this.animate();
   }
 
@@ -106,7 +103,7 @@ class ParticleMorpher {
       vertexShader,
       fragmentShader,
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
       depthWrite: false,
     });
 
@@ -116,30 +113,17 @@ class ParticleMorpher {
 
   private async loadModels() {
     const progressBar = document.getElementById("progress-bar");
-    const onProgress = (percent: number) => {
-      if (progressBar) progressBar.style.width = `${percent}%`;
-    };
+    if (progressBar) progressBar.style.width = `100%`;
 
-    const [queenPoints, pawnPoints] = await Promise.all([
-      this.modelLoader.load(
-        "models/Queen.obj",
-        this.settings.particleCount,
-        onProgress
-      ),
-      this.modelLoader.load("models/Pawn.obj", this.settings.particleCount),
-    ]);
-
-    if (queenPoints) this.models["queen"] = queenPoints;
-    if (pawnPoints) this.models["pawn"] = pawnPoints;
+    this.models["heart"] = this.getHeartPositions();
   }
 
   public morphTo(shape: string) {
-    if (this.isTransitioning && shape !== "explode") return;
+    if (this.isTransitioning) return;
     if (!this.particles) return;
     this.isTransitioning = true;
 
-    const targetPositions =
-      shape === "explode" ? this.getExplodePositions() : this.models[shape];
+    const targetPositions = this.models[shape];
 
     if (!targetPositions) {
       this.isTransitioning = false;
@@ -166,12 +150,27 @@ class ParticleMorpher {
     });
   }
 
-  private getExplodePositions(): Float32Array {
+  private getHeartPositions(): Float32Array {
     const positions = new Float32Array(this.settings.particleCount * 3);
     for (let i = 0; i < this.settings.particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 500;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 500;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 500;
+      let x, y, z;
+      while (true) {
+        x = (Math.random() - 0.5) * 3.0;
+        y = (Math.random() - 0.5) * 3.0;
+        z = (Math.random() - 0.5) * 3.0;
+        const x2 = x * x;
+        const y2 = y * y;
+        const z2 = z * z;
+        const a = x2 + 2.25 * z2 + y2 - 1.0;
+        const val = a * a * a - x2 * y * y2 - 0.1125 * z2 * y * y2;
+        if (val <= 0.0 && val > -0.1) {
+          const scale = 10;
+          positions[i * 3] = x * scale;
+          positions[i * 3 + 1] = y * scale;
+          positions[i * 3 + 2] = z * scale;
+          break;
+        }
+      }
     }
     return positions;
   }
@@ -197,7 +196,6 @@ class ParticleMorpher {
   private setupEvents() {
     window.addEventListener("resize", () => this.handleResize());
 
-    // Setting updates from UI Manager
     window.addEventListener("setting-update", (e: any) => {
       const { type, value } = e.detail;
       if (
@@ -232,7 +230,6 @@ class ParticleMorpher {
       updateMouse(e.clientX, e.clientY)
     );
 
-    // Touch support
     const handleTouch = (e: TouchEvent) => {
       const isCanvas = (e.target as HTMLElement).id === "canvas";
       if (e.touches.length > 0) {

@@ -1,12 +1,12 @@
 :root {
-  --primary-bg: #030012;
+  --primary-bg: #ffffff;
   --accent-blue: #088cff;
   --accent-red: #ff052b;
   --accent-green: #00ff88;
-  --text-main: #ffffff;
-  --text-muted: rgba(255, 255, 255, 0.6);
-  --glass-bg: rgba(15, 10, 30, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-main: #111111;
+  --text-muted: rgba(0, 0, 0, 0.6);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.1);
   --font-main: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }

@@ -14,8 +14,8 @@ export interface ParticleSettings {
 }
 
 export const DEFAULT_SETTINGS: ParticleSettings = {
-  particleCount: 15000,
-  particleSize: 1.2,
+  particleCount: 60000,
+  particleSize: 3.6,
   animationSpeed: 1,
   autoRotate: true,
   morphDuration: 2.5,
@@ -51,7 +51,7 @@ export class UIManager {
   }
 
   private setupShapeButtons() {
-    const shapes = ["queen", "pawn", "explode"];
+    const shapes = ["heart"];
     shapes.forEach((shape) => {
       const btn = document.getElementById(`btn-${shape}`);
       if (btn) {
