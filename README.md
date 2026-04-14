@@ -23,7 +23,7 @@ This project demonstrates a 3D heart particle morphing effect using Three.js. Pa
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Kshitij978/Three.js-Point-cloud-morphing-effect.git
+   git clone https://github.com/misharo9/HeartParticle.git
    cd Three.js-Point-cloud-morphing-effect
    ```
 
